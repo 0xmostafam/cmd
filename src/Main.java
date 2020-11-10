@@ -2,7 +2,7 @@ import java.util.HashMap;
 import java.util.Scanner;
 
 public class Main {
-    public static HashMap<String, Integer> CommandsList = new HashMap<>();
+    public static HashMap<String, int[]> CommandsList = new HashMap<>();
     public static String homeDirectory = "/home/mostafa";
     public static String currentDirectory = "/home/mostafa/";
     public static void main(String[] args) {
@@ -42,20 +42,20 @@ public class Main {
     }
 
     static void initializeMap(){
-        CommandsList.put("cd",1);
-        CommandsList.put("ls",0);
-        CommandsList.put("cp",2);
-        CommandsList.put("cat",1);
-        CommandsList.put("more",1);
-        CommandsList.put("mkdir",1);
-        CommandsList.put("rmdir",1);
-        CommandsList.put("mv",2);
-        CommandsList.put("rm",1);
-        CommandsList.put("args",1);
-        CommandsList.put("date",0);
-        CommandsList.put("help",0);
-        CommandsList.put("pwd",0);
-        CommandsList.put("clear",0);
-        CommandsList.put("exit",0);
+        CommandsList.put("cd", new int[]{0, 1});
+        CommandsList.put("ls",new int[]{0, 1});
+        CommandsList.put("cp",new int[]{2, 10});
+        CommandsList.put("cat",new int[]{1, 1});
+        CommandsList.put("more",new int[]{1, 1});
+        CommandsList.put("mkdir",new int[]{1, 1});
+        CommandsList.put("rmdir",new int[]{1, 1});
+        CommandsList.put("mv",new int[]{2, 10});
+        CommandsList.put("rm",new int[]{1, 1});
+        CommandsList.put("args",new int[]{1, 1});
+        CommandsList.put("date",new int[]{0, 0});
+        CommandsList.put("help",new int[]{0, 0});
+        CommandsList.put("pwd",new int[]{0, 0});
+        CommandsList.put("clear",new int[]{0, 0});
+        CommandsList.put("exit",new int[]{0, 0});
     }
 }

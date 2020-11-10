@@ -17,8 +17,8 @@ public class Parser {
             return false;
         }
 
-        if(Main.CommandsList.get(cmd) != (tokens.length - 1)){
-            System.out.println(cmd + " have " + Main.CommandsList.get(cmd) + " arguments.");
+        if(!(Main.CommandsList.get(cmd)[0] <= (tokens.length - 1) && Main.CommandsList.get(cmd)[1] >= (tokens.length - 1))){
+            System.out.println(cmd + " have " + Main.CommandsList.get(cmd)[0] + " arguments.");
             return false;
         }
 
