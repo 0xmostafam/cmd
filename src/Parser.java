@@ -1,24 +1,24 @@
+import java.util.ArrayList;
+
 public class Parser {
-    private String[] args = new String[2];
+    private ArrayList<String> args = new ArrayList<String>();
     private String cmd;
 
-    public Parser(){
-        cmd = "";
-    }
     public boolean parse(String input){
         String[] tokens = input.split(" ");
         cmd = tokens[0];
 
+        args.clear();
         for(int i = 1 ; i < tokens.length ; i++){
-            args[i - 1] = tokens[i];
+            args.add(tokens[i]);
         }
 
-        if(!Main.Commands.containsKey(cmd)){
+        if(!Main.CommandsList.containsKey(cmd)){
             return false;
         }
 
-        if(Main.Commands.get(cmd) != (tokens.length - 1)){
-            System.out.println(cmd + " have " + Main.Commands.get(cmd) + " arguments.");
+        if(Main.CommandsList.get(cmd) != (tokens.length - 1)){
+            System.out.println(cmd + " have " + Main.CommandsList.get(cmd) + " arguments.");
             return false;
         }
 
@@ -29,7 +29,7 @@ public class Parser {
         return cmd;
     }
 
-    public String[] getArguments(){
+    public ArrayList<String> getArguments(){
         return args;
     }
 }
