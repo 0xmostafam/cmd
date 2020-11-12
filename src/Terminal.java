@@ -136,9 +136,6 @@ public class Terminal {
             System.out.println("path is invalid , or isn't a file.");
             return;
         }
-        if(!ls(destinationPath).isEmpty()){
-            System.out.println("cannot remove an non-empty directory.");
-        }
         file.delete();
     }
     public void args(String command){
