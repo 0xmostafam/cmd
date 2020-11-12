@@ -6,15 +6,17 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class Terminal {
-    public void cd(){
+    public String cd(){
         Main.currentDirectory = Main.homeDirectory;
+        return "";
     }
-    public void cd(String destinationPath){
+    public String cd(String destinationPath){
         File file = new File(handlePath(destinationPath));
         if(!handlePath(destinationPath).equals("") && file.isDirectory()){
             Main.currentDirectory = handlePath(destinationPath);
+            return "";
         } else {
-            System.out.println("invalid path");
+            return "invalid path";
         }
     }
     public ArrayList<String> ls(){
@@ -34,12 +36,11 @@ public class Terminal {
         ArrayList<String> dirFiles = new ArrayList<String>(Arrays.asList(pathnames));
         return dirFiles;
     }
-    public void cp(String sourcePath, String destinationPath ){
+    public String cp(String sourcePath, String destinationPath ){
         File srcFile = new File(handlePath(sourcePath));
         File desFile = new File(handlePath(destinationPath));
         if(handlePath(sourcePath).equals("") || handlePath(destinationPath).equals("") || !srcFile.isFile() || !desFile.isDirectory()){
-            System.out.println(sourcePath + " is not a file or " + destinationPath  + "is not a directory.");
-            return;
+            return sourcePath + " is not a file or " + destinationPath  + "is not a directory.";
         }
         try {
             String[] fileNames = sourcePath.split("/");
@@ -54,15 +55,16 @@ public class Terminal {
             while ((length = inputStream.read(buffer)) > 0) {
                 outputStream.write(buffer, 0, length);
             }
+            return "";
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return "";
     }
-    public void cat(String destinationPath){
+    public String cat(String destinationPath){
         File file = new File(handlePath(destinationPath));
         if(handlePath(destinationPath).equals("") && !file.isFile()){
-            System.out.println(destinationPath + " is not a file.");
-            return;
+            return destinationPath + " is not a file.";
         }
         Scanner fileReader;
         try {
@@ -71,17 +73,17 @@ public class Terminal {
             while (fileReader.hasNextLine()) {
                 data = data + fileReader.nextLine()+ "\n";
             }
-            System.out.println(data);
             fileReader.close();
+            return data;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        return "";
     }
-    public void more(String destinationPath){
+    public String more(String destinationPath){
         File file = new File(handlePath(destinationPath));
         if(handlePath(destinationPath).equals("") && !file.isFile()){
-            System.out.println(destinationPath + " is not a file.");
-            return;
+            return destinationPath + " is not a file.";
         }
         Scanner fileReader , scanner;
         try {
@@ -107,96 +109,97 @@ public class Terminal {
                 count++;
             }
             fileReader.close();
+            return data;
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
+        return "";
     }
-    public void mkdir(String dirName){
+    public String mkdir(String dirName){
         File file = new File(Main.currentDirectory + "/" + dirName);
         file.mkdir();
+        return "";
     }
-    public void rmdir(String dirName){
+    public String rmdir(String dirName){
         File file = new File(Main.currentDirectory + "/" + dirName);
         if(handlePath(Main.currentDirectory + "/" + dirName).equals("") || !file.isDirectory()){
-            System.out.println("path is invalid , or isn't a directory.");
-            return;
+            return "path is invalid , or isn't a directory.";
         }
         if(!ls(Main.currentDirectory + "/" + dirName).isEmpty()){
-            System.out.println("cannot remove an non-empty directory.");
+            return"cannot remove an non-empty directory.";
         }
         file.delete();
+        return "";
     }
-    public void mv(String sourcePath, String destinationPath){
+    public String mv(String sourcePath, String destinationPath){
         cp(sourcePath ,destinationPath);
         rm(sourcePath);
+        return "";
     }
-    public void rm(String destinationPath){
+    public String rm(String destinationPath){
         File file = new File(handlePath(destinationPath));
         if(handlePath(destinationPath).equals("") || !file.isFile()){
-            System.out.println("path is invalid , or isn't a file.");
-            return;
+            return "path is invalid , or isn't a file.";
         }
         file.delete();
+        return "";
     }
-    public void args(String command){
+    public String args(String command){
         switch(command) {
             case "cd":
             case "ls":
-                System.out.println("no arg or arg1: DestinationPath");
-                break;
+                return "no arg or arg1: DestinationPath";
             case "cp":
             case "cat":
             case "more":
             case "mv":
-                System.out.println("arg1: SourcePath[], arg2:DestinationPath");
-                break;
+                return "arg1: SourcePath[], arg2:DestinationPath";
             case "mkdir":
             case "rmdir":
-                System.out.println("arg1: dirName");
+                return "arg1: dirName";
             case "rm":
-                System.out.println("arg1: DestinationPath");
-                break;
+                return "arg1: DestinationPath";
             case "args":
-                System.out.println("arg1: Command");
-                break;
+                return "arg1: Command";
             case "date":
             case "help":
             case "pwd":
             case "clear":
-                System.out.println("no args");
-                break;
+                return "no args";
             default:
-                System.out.println("invalid command");
+                return "invalid command";
         }
     }
-    public void date(){
+    public String date(){
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
-        System.out.println(formatter.format(date));
+        return formatter.format(date);
     }
-    public void help(){
-        System.out.println("cd : Change the shell working directory.");
-        System.out.println("ls : List information about the FILEs (the current directory by default).");
-        System.out.println("cp : Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.");
-        System.out.println("cat : Concatenate FILE(s) to standard output.");
-        System.out.println("more : A file perusal filter for CRT viewing.");
-        System.out.println("mkdir : Create the DIRECTORY(ies), if they do not already exist.");
-        System.out.println("rmdir : Remove the DIRECTORY(ies), if they are empty.");
-        System.out.println("mv : Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.");
-        System.out.println("rm : Remove (unlink) the FILE(s).");
-        System.out.println("args : Lists argument(s) in a command.");
-        System.out.println("date : Display the current time in the certain format.");
-        System.out.println("help : List all commands functionalities");
-        System.out.println("pwd : Print the name of the current working directory.");
-        System.out.println("clear : Clears the shell.");
+    public String help(){
+        return "cd : Change the shell working directory.\n" +
+        "ls : List information about the FILEs (the current directory by default).\n" +
+                "cp : Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.\n" +
+                "cat : Concatenate FILE(s) to standard output.\n"+
+                "more : A file perusal filter for CRT viewing.\n"+
+                "mkdir : Create the DIRECTORY(ies), if they do not already exist.\n"+
+                "rmdir : Remove the DIRECTORY(ies), if they are empty.\n"+
+                "mv : Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.\n"+
+                "rm : Remove (unlink) the FILE(s).\n"+
+                "args : Lists argument(s) in a command.\n"+
+                "date : Display the current time in the certain format.\n"+
+                "help : List all commands functionalities\n"+
+                "pwd : Print the name of the current working directory.\n"+
+                "clear : Clears the shell.\n";
+
     }
-    public void pwd(){
-        System.out.println(Main.currentDirectory);
+    public String pwd(){
+        return Main.currentDirectory;
     }
-    public void clear(){
+    public String clear(){
         for(int i = 0 ; i < 150 ; i++){
             System.out.println("\n");
         }
+        return "";
     }
 
     private String handlePath(String destinationPath){
@@ -242,11 +245,7 @@ public class Terminal {
     private void createFile(String path){
         try {
             File myObj = new File(path);
-            if (myObj.createNewFile()) {
-                System.out.println("File created: " + myObj.getName());
-            } else {
-                System.out.println("File already exists.");
-            }
+            myObj.createNewFile();
         }catch (IOException e) {
             System.out.println("An error occurred.");
             e.printStackTrace();

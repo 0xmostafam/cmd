@@ -1,3 +1,6 @@
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -33,136 +36,137 @@ public class Main {
                 }
 
                 if (parser.parse(command)) {
-                    invokeCommands();
+                    String data = invokeCommands();
+                    if(hasRedirect)
+                    {
+                        createFile(fileName);
+                        writeToFile(data , fileName, false);
+                    } else if (hasTwoRedirect){
+                        createFile(fileName);
+                        writeToFile(data , fileName, true);
+                    } else
+                        System.out.println(data);
                 }
-                else
-                    System.out.println("error");
 
-                if(hasRedirect || hasTwoRedirect)
-                    System.out.println("Output in file : " + fileName);
             }
         }
     }
 
-    static void invokeCommands(){
+    static String invokeCommands(){
         switch(parser.getCmd()) {
             case "cd":
-                cd();
-                break;
+                return cd();
             case "ls":
-                ls();
-                break;
+                return ls();
             case "cp":
-                cp();
-                break;
+                return cp();
             case "cat":
-                cat();
-                break;
+                return cat();
             case "more":
-                more();
-                break;
+                return more();
             case "mkdir":
-                mkdir();
-                break;
+                return mkdir();
             case "rmdir":
-                rmdir();
-                break;
+                return rmdir();
             case "mv":
-                mv();
-                break;
+                return mv();
             case "rm":
-                rm();
-                break;
+                return rm();
             case "args":
-                args();
-                break;
+                return args();
             case "date":
-                date();
-                break;
+                return date();
             case "help":
-                help();
-                break;
+                return help();
             case "pwd":
-                pwd();
-                break;
+                return pwd();
             case "clear":
-                clear();
-                break;
+                return clear();
             default:
-                System.out.println("error");
+                return "error";
         }
     }
-    static void cd(){
+    static String cd(){
         if(parser.getArguments().isEmpty()){
-            terminal.cd();
+            return terminal.cd();
         } else {
-            terminal.cd(parser.getArguments().get(0));
+            return terminal.cd(parser.getArguments().get(0));
         }
     }
-    static void ls(){
+    static String ls(){
+        String data = "";
         if(parser.getArguments().isEmpty()){
             ArrayList<String> dirs = terminal.ls();
             for(int i = 0 ; i < dirs.size() ; i++){
                 if(i % 5 == 0 && i != 0)
-                    System.out.println('\n');
-                System.out.print(dirs.get(i)+ "    ");
+                    data = data + '\n';
+                data = data + dirs.get(i)+ "    ";
             }
         } else {
             ArrayList<String> dirs = terminal.ls(parser.getArguments().get(0));
             for(int i = 0 ; i < dirs.size() ; i++){
                 if(i % 5 == 0 && i != 0)
-                    System.out.println('\n');
-                System.out.print(dirs.get(i) + "    ");
+                    data = data + '\n';
+                data = data + dirs.get(i) + "    ";
             }
         }
+        return data;
     }
-    static void cp(){
+    static String cp(){
         int argSize = parser.getArguments().size();
+        String data = "";
         for(int i = 0 ; i < argSize - 1 ; i++){
-            terminal.cp(parser.getArguments().get(i) , parser.getArguments().get(argSize - 1));
+            data = data + terminal.cp(parser.getArguments().get(i) , parser.getArguments().get(argSize - 1)) + "\n";
         }
+        return data;
     }
-    static void cat(){
+    static String cat(){
         int argSize = parser.getArguments().size();
+        String data = "";
         for(int i = 0 ; i < argSize; i++){
-            terminal.cat(parser.getArguments().get(i));
+            data = data + terminal.cat(parser.getArguments().get(i)) + "\n";
         }
+        return data;
     }
-    static void more(){
+    static String more(){
         int argSize = parser.getArguments().size();
+        String data = "";
         for(int i = 0 ; i < argSize; i++){
-            terminal.more(parser.getArguments().get(i));
+            data = data + terminal.more(parser.getArguments().get(i)) + "\n";
         }
+        return data;
     }
-    static void mkdir(){
-        terminal.mkdir(parser.getArguments().get(0));
+    static String mkdir(){
+        return terminal.mkdir(parser.getArguments().get(0));
     }
-    static void rmdir(){
-        terminal.rmdir(parser.getArguments().get(0));
+    static String rmdir(){
+        return terminal.rmdir(parser.getArguments().get(0));
     }
-    static void mv(){
+    static String mv(){
         int argSize = parser.getArguments().size();
+        String data = "";
         for(int i = 0 ; i < argSize - 1 ; i++){
-            terminal.mv(parser.getArguments().get(i) , parser.getArguments().get(argSize - 1));
+            data = data + terminal.mv(parser.getArguments().get(i) , parser.getArguments().get(argSize - 1)) + "\n";
         }
+        return data;
     }
-    static void rm(){
-        terminal.rm(parser.getArguments().get(0));
+    static String rm(){
+        return terminal.rm(parser.getArguments().get(0));
     }
-    static void args(){
-        terminal.args(parser.getArguments().get(0));
+    static String args(){
+        return terminal.args(parser.getArguments().get(0));
     }
-    static void date(){
-        terminal.date();
+    static String date(){
+        return terminal.date();
     }
-    static void help(){
-        terminal.help();
+    static String help(){
+        return terminal.help();
     }
-    static void pwd(){
-        terminal.pwd();
+    static String pwd(){
+        return terminal.pwd();
     }
-    static void clear(){
-        terminal.clear();
+    static String clear(){
+        return terminal.clear();
     }
     static void initializeMap(){
         CommandsList.put("cd", new int[]{0, 1});
@@ -180,5 +184,24 @@ public class Main {
         CommandsList.put("pwd",new int[]{0, 0});
         CommandsList.put("clear",new int[]{0, 0});
         CommandsList.put("exit",new int[]{0, 0});
+    }
+    public static void createFile(String fileName){
+        try {
+            File myObj = new File(currentDirectory + "/" + fileName);
+            myObj.createNewFile();
+        }catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+    }
+    public static void writeToFile(String data , String fileName , boolean append){
+        try {
+            FileWriter myWriter = new FileWriter(currentDirectory + "/" + fileName ,append);
+            myWriter.write(data);
+            myWriter.close();
+        } catch (IOException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
     }
 }
