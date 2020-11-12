@@ -1,6 +1,8 @@
 import java.io.*;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Scanner;
 
 public class Terminal {
@@ -23,11 +25,11 @@ public class Terminal {
         return dirFiles;
     }
     public ArrayList<String> ls(String destinationPath){
-        if(!handlePath(destinationPath).equals("")){
+        if(handlePath(destinationPath).equals("")){
             return new ArrayList<String>(Arrays.asList("invalid path"));
         }
         String[] pathnames;
-        File f = new File(destinationPath);
+        File f = new File(handlePath(destinationPath));
         pathnames = f.list();
         ArrayList<String> dirFiles = new ArrayList<String>(Arrays.asList(pathnames));
         return dirFiles;
@@ -101,6 +103,7 @@ public class Terminal {
                     }
                 }
                 System.out.println(fileReader.nextLine());
+                data = data + fileReader.nextLine() + "\n";
                 count++;
             }
             fileReader.close();
@@ -108,19 +111,102 @@ public class Terminal {
             e.printStackTrace();
         }
     }
-    public void mkdir(String dirName){}
-    public void rmdir(String dirName){}
-    public void mv(String sourcePath, String destinationPath){}
-    public void rm(String sourcePath){}
-    public void args(){}
-    public void date(){}
-    public void help(){}
-    public void pwd(){}
-    public void clear(){}
+    public void mkdir(String dirName){
+        File file = new File(Main.currentDirectory + "/" + dirName);
+        file.mkdir();
+    }
+    public void rmdir(String dirName){
+        File file = new File(Main.currentDirectory + "/" + dirName);
+        if(handlePath(Main.currentDirectory + "/" + dirName).equals("") || !file.isDirectory()){
+            System.out.println("path is invalid , or isn't a directory.");
+            return;
+        }
+        if(!ls(Main.currentDirectory + "/" + dirName).isEmpty()){
+            System.out.println("cannot remove an non-empty directory.");
+        }
+        file.delete();
+    }
+    public void mv(String sourcePath, String destinationPath){
+        cp(sourcePath ,destinationPath);
+        rm(sourcePath);
+    }
+    public void rm(String destinationPath){
+        File file = new File(handlePath(destinationPath));
+        if(handlePath(destinationPath).equals("") || !file.isFile()){
+            System.out.println("path is invalid , or isn't a file.");
+            return;
+        }
+        if(!ls(destinationPath).isEmpty()){
+            System.out.println("cannot remove an non-empty directory.");
+        }
+        file.delete();
+    }
+    public void args(String command){
+        switch(command) {
+            case "cd":
+            case "ls":
+                System.out.println("no arg or arg1: DestinationPath");
+                break;
+            case "cp":
+            case "cat":
+            case "more":
+            case "mv":
+                System.out.println("arg1: SourcePath[], arg2:DestinationPath");
+                break;
+            case "mkdir":
+            case "rmdir":
+                System.out.println("arg1: dirName");
+            case "rm":
+                System.out.println("arg1: DestinationPath");
+                break;
+            case "args":
+                System.out.println("arg1: Command");
+                break;
+            case "date":
+            case "help":
+            case "pwd":
+            case "clear":
+                System.out.println("no args");
+                break;
+            default:
+                System.out.println("invalid command");
+        }
+    }
+    public void date(){
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = new Date();
+        System.out.println(formatter.format(date));
+    }
+    public void help(){
+        System.out.println("cd : Change the shell working directory.");
+        System.out.println("ls : List information about the FILEs (the current directory by default).");
+        System.out.println("cp : Copy SOURCE to DEST, or multiple SOURCE(s) to DIRECTORY.");
+        System.out.println("cat : Concatenate FILE(s) to standard output.");
+        System.out.println("more : A file perusal filter for CRT viewing.");
+        System.out.println("mkdir : Create the DIRECTORY(ies), if they do not already exist.");
+        System.out.println("rmdir : Remove the DIRECTORY(ies), if they are empty.");
+        System.out.println("mv : Rename SOURCE to DEST, or move SOURCE(s) to DIRECTORY.");
+        System.out.println("rm : Remove (unlink) the FILE(s).");
+        System.out.println("args : Lists argument(s) in a command.");
+        System.out.println("date : Display the current time in the certain format.");
+        System.out.println("help : List all commands functionalities");
+        System.out.println("pwd : Print the name of the current working directory.");
+        System.out.println("clear : Clears the shell.");
+    }
+    public void pwd(){
+        System.out.println(Main.currentDirectory);
+    }
+    public void clear(){
+        for(int i = 0 ; i < 150 ; i++){
+            System.out.println("\n");
+        }
+    }
 
     private String handlePath(String destinationPath){
         String customPath = Main.currentDirectory;
         String[] files = destinationPath.split("/");
+        if(files.length == 0)
+            customPath = "/";
         boolean validPath = true;
         for(int i = 0 ; i < files.length ; i++) {
             if (files[i].equals("..")) {
@@ -136,7 +222,10 @@ public class Terminal {
                 if(files[i].equals("")){
                     customPath = "/";
                 } else {
-                    ArrayList<String> dirFiles = ls(customPath);
+                    String[] pathnames;
+                    File f = new File(customPath);
+                    pathnames = f.list();
+                    ArrayList<String> dirFiles = new ArrayList<String>(Arrays.asList(pathnames));
                     if (dirFiles.contains(files[i]) && !customPath.equals("/")) {
                         customPath = customPath + "/" + files[i];
                     } else if(dirFiles.contains(files[i])){

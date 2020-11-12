@@ -61,6 +61,33 @@ public class Main {
             case "more":
                 more();
                 break;
+            case "mkdir":
+                mkdir();
+                break;
+            case "rmdir":
+                rmdir();
+                break;
+            case "mv":
+                mv();
+                break;
+            case "rm":
+                rm();
+                break;
+            case "args":
+                args();
+                break;
+            case "date":
+                date();
+                break;
+            case "help":
+                help();
+                break;
+            case "pwd":
+                pwd();
+                break;
+            case "clear":
+                clear();
+                break;
             default:
                 System.out.println("error");
         }
@@ -106,6 +133,36 @@ public class Main {
         for(int i = 0 ; i < argSize; i++){
             terminal.more(parser.getArguments().get(i));
         }
+    }
+    static void mkdir(){
+        terminal.mkdir(parser.getArguments().get(0));
+    }
+    static void rmdir(){
+        terminal.rmdir(parser.getArguments().get(0));
+    }
+    static void mv(){
+        int argSize = parser.getArguments().size();
+        for(int i = 0 ; i < argSize - 1 ; i++){
+            terminal.mv(parser.getArguments().get(i) , parser.getArguments().get(argSize - 1));
+        }
+    }
+    static void rm(){
+        terminal.rm(parser.getArguments().get(0));
+    }
+    static void args(){
+        terminal.args(parser.getArguments().get(0));
+    }
+    static void date(){
+        terminal.date();
+    }
+    static void help(){
+        terminal.help();
+    }
+    static void pwd(){
+        terminal.pwd();
+    }
+    static void clear(){
+        terminal.clear();
     }
     static void initializeMap(){
         CommandsList.put("cd", new int[]{0, 1});
