@@ -14,7 +14,8 @@ public class Main {
     public static void main(String[] args) {
         initializeMap();
         Scanner scanner = new Scanner(System.in);
-        while(true){
+        String data = "";
+        while(!data.equals("exit")){
             System.out.print("\n" + currentDirectory + "$ ");
             String input = scanner.nextLine();
             String[] commands = input.split(" \\| ");
@@ -36,7 +37,9 @@ public class Main {
                 }
 
                 if (parser.parse(command)) {
-                    String data = invokeCommands();
+                    data = invokeCommands();
+                    if (data.equals("exit"))
+                        break;
                     if(hasRedirect)
                     {
                         createFile(fileName);
@@ -82,6 +85,8 @@ public class Main {
                 return pwd();
             case "clear":
                 return clear();
+            case "exit":
+                return "exit";
             default:
                 return "error";
         }
