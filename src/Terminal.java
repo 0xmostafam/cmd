@@ -104,8 +104,9 @@ public class Terminal {
                         count = 0;
                     }
                 }
+                String tempStr = fileReader.nextLine();
                 System.out.println(fileReader.nextLine());
-                data = data + fileReader.nextLine() + "\n";
+                data = data + tempStr+ "\n";
                 count++;
             }
             fileReader.close();
