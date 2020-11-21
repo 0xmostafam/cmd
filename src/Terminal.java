@@ -1,4 +1,7 @@
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -6,26 +9,35 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class Terminal {
-    public String cd(){
-        Main.currentDirectory = Main.homeDirectory;
+	
+	public String cd(){
+		Main.currentDirectory = Main.homeDirectory;
         return "";
     }
-    public String cd(String destinationPath){
-        File file = new File(handlePath(destinationPath));
+	
+	public String cd(String destinationPath){
+		File file = new File(handlePath(destinationPath));
         if(!handlePath(destinationPath).equals("") && file.isDirectory()){
             Main.currentDirectory = handlePath(destinationPath);
             return "";
         } else {
             return "invalid path";
         }
-    }
-    public ArrayList<String> ls(){
-        String[] pathnames;
-        File f = new File(Main.currentDirectory);
-        pathnames = f.list();
-        ArrayList<String> dirFiles = new ArrayList<String>(Arrays.asList(pathnames));
+	}
+	
+	public ArrayList<String> ls()  {
+		var dirName = Paths.get(Main.currentDirectory);
+        ArrayList<String> dirFiles = new ArrayList<String>();
+        try (var paths = Files.newDirectoryStream(dirName)) {
+            for (Path path : paths) {
+            	dirFiles.add(path.getFileName().toString());
+            }
+        }catch (IOException e) {
+  	      e.printStackTrace();
+  	    } 
         return dirFiles;
     }
+    
     public ArrayList<String> ls(String destinationPath){
         if(handlePath(destinationPath).equals("")){
             return new ArrayList<String>(Arrays.asList("invalid path"));
@@ -36,18 +48,27 @@ public class Terminal {
         ArrayList<String> dirFiles = new ArrayList<String>(Arrays.asList(pathnames));
         return dirFiles;
     }
+    
     public String cp(String sourcePath, String destinationPath ){
         File srcFile = new File(handlePath(sourcePath));
+        if(destinationPath.contains("."))
+        	createFile(Main.currentDirectory + "/" + destinationPath);
         File desFile = new File(handlePath(destinationPath));
-        if(handlePath(sourcePath).equals("") || handlePath(destinationPath).equals("") || !srcFile.isFile() || !desFile.isDirectory()){
-            return sourcePath + " is not a file or " + destinationPath  + "is not a directory.";
+        if(handlePath(sourcePath).equals("") || handlePath(destinationPath).equals("") || !srcFile.isFile()){
+            return sourcePath + " is not a file or " + destinationPath  + " is not a directory.";
         }
         try {
-            String[] fileNames = sourcePath.split("/");
-            String fileName = fileNames[fileNames.length - 1];
-            createFile(handlePath(destinationPath) + "/" + fileName);
-            File sourceFile = new File(handlePath(sourcePath));
-            File destinationFile = new File(handlePath(destinationPath) + "/" + fileName);
+        	String fileName = "";
+        	File sourceFile = new File(handlePath(sourcePath));
+            File destinationFile = null;
+        	if (desFile.isDirectory()) {
+        		String[] fileNames = sourcePath.split("/");
+        		fileName = fileNames[fileNames.length - 1];
+                createFile(handlePath(destinationPath) + "/" + fileName);
+                destinationFile = new File(handlePath(destinationPath) + "/" + fileName);
+        	} else {
+        		destinationFile = new File(handlePath(destinationPath));
+        	}
             InputStream inputStream = new FileInputStream(sourceFile);
             OutputStream outputStream = new FileOutputStream(destinationFile);
             byte[] buffer = new byte[1024];
@@ -61,6 +82,7 @@ public class Terminal {
         }
         return "";
     }
+    
     public String cat(String destinationPath){
         File file = new File(handlePath(destinationPath));
         if(handlePath(destinationPath).equals("") && !file.isFile()){
@@ -80,6 +102,7 @@ public class Terminal {
         }
         return "";
     }
+    
     public String more(String destinationPath){
         File file = new File(handlePath(destinationPath));
         if(handlePath(destinationPath).equals("") && !file.isFile()){
@@ -105,7 +128,7 @@ public class Terminal {
                     }
                 }
                 String tempStr = fileReader.nextLine();
-                System.out.println(fileReader.nextLine());
+                System.out.println(tempStr);
                 data = data + tempStr+ "\n";
                 count++;
             }
@@ -116,35 +139,41 @@ public class Terminal {
         }
         return "";
     }
+   
     public String mkdir(String dirName){
         File file = new File(Main.currentDirectory + "/" + dirName);
         file.mkdir();
         return "";
     }
+    
     public String rmdir(String dirName){
         File file = new File(Main.currentDirectory + "/" + dirName);
         if(handlePath(Main.currentDirectory + "/" + dirName).equals("") || !file.isDirectory()){
-            return "path is invalid , or isn't a directory.";
+            return dirName + " path is invalid , or isn't a directory.";
         }
         if(!ls(Main.currentDirectory + "/" + dirName).isEmpty()){
-            return"cannot remove an non-empty directory.";
+            return dirName + ": cannot remove an non-empty directory.";
         }
         file.delete();
         return "";
     }
+    
     public String mv(String sourcePath, String destinationPath){
-        cp(sourcePath ,destinationPath);
+    	String data = "";
+        data = cp(sourcePath ,destinationPath);
         rm(sourcePath);
-        return "";
+        return data;
     }
+    
     public String rm(String destinationPath){
-        File file = new File(handlePath(destinationPath));
+    	File file = new File(handlePath(destinationPath));
         if(handlePath(destinationPath).equals("") || !file.isFile()){
-            return "path is invalid , or isn't a file.";
+            return destinationPath + " path is invalid , or isn't a file.";
         }
         file.delete();
         return "";
     }
+    
     public String args(String command){
         switch(command) {
             case "cd":
@@ -171,11 +200,13 @@ public class Terminal {
                 return "invalid command";
         }
     }
+    
     public String date(){
         SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         Date date = new Date();
         return formatter.format(date);
     }
+    
     public String help(){
         return "cd : Change the shell working directory.\n" +
         "ls : List information about the FILEs (the current directory by default).\n" +
@@ -193,16 +224,19 @@ public class Terminal {
                 "clear : Clears the shell.\n";
 
     }
+    
     public String pwd(){
         return Main.currentDirectory;
     }
+    
     public String clear(){
         for(int i = 0 ; i < 150 ; i++){
             System.out.println("\n");
         }
+        System.out.println("\033[H\033[2J");
         return "";
     }
-
+    
     private String handlePath(String destinationPath){
         String customPath = Main.currentDirectory;
         String[] files = destinationPath.split("/");
@@ -243,6 +277,7 @@ public class Terminal {
         else
             return "";
     }
+    
     private void createFile(String path){
         try {
             File myObj = new File(path);

@@ -14,8 +14,7 @@ public class Main {
     public static void main(String[] args) {
         initializeMap();
         Scanner scanner = new Scanner(System.in);
-        String data = "";
-        while(!data.equals("exit")){
+        while(true){
             System.out.print("\n" + currentDirectory + "$ ");
             String input = scanner.nextLine();
             String[] commands = input.split(" \\| ");
@@ -37,9 +36,7 @@ public class Main {
                 }
 
                 if (parser.parse(command)) {
-                    data = invokeCommands();
-                    if (data.equals("exit"))
-                        break;
+                    String data = invokeCommands(hasRedirect || hasTwoRedirect);
                     if(hasRedirect)
                     {
                         createFile(fileName);
@@ -55,7 +52,7 @@ public class Main {
         }
     }
 
-    static String invokeCommands(){
+    static String invokeCommands(boolean redirect){
         switch(parser.getCmd()) {
             case "cd":
                 return cd();
@@ -66,6 +63,8 @@ public class Main {
             case "cat":
                 return cat();
             case "more":
+            	if(redirect)
+            		return cat();
                 return more();
             case "mkdir":
                 return mkdir();
@@ -86,7 +85,7 @@ public class Main {
             case "clear":
                 return clear();
             case "exit":
-                return "exit";
+            	System.exit(0);
             default:
                 return "error";
         }
@@ -142,10 +141,18 @@ public class Main {
         return data;
     }
     static String mkdir(){
-        return terminal.mkdir(parser.getArguments().get(0));
+    	String data = "";
+    	for(int i = 0 ; i < parser.getArguments().size(); i++) {
+    		data = data + terminal.mkdir(parser.getArguments().get(i)) + "\n";
+    	}
+    	return data;
     }
     static String rmdir(){
-        return terminal.rmdir(parser.getArguments().get(0));
+    	String data = "";
+    	for(int i = 0 ; i < parser.getArguments().size(); i++) {
+    		data = data + terminal.rmdir(parser.getArguments().get(i)) + "\n";
+    	}
+    	return data;
     }
     static String mv(){
         int argSize = parser.getArguments().size();
@@ -156,7 +163,11 @@ public class Main {
         return data;
     }
     static String rm(){
-        return terminal.rm(parser.getArguments().get(0));
+    	String data = "";
+		for(int i = 0 ; i < parser.getArguments().size(); i++) {
+			data = data + terminal.rm(parser.getArguments().get(i)) + "\n";
+		}
+		return data;
     }
     static String args(){
         return terminal.args(parser.getArguments().get(0));
@@ -176,13 +187,13 @@ public class Main {
     static void initializeMap(){
         CommandsList.put("cd", new int[]{0, 1});
         CommandsList.put("ls",new int[]{0, 1});
-        CommandsList.put("cp",new int[]{2, 10});
-        CommandsList.put("cat",new int[]{1, 10});
-        CommandsList.put("more",new int[]{1, 10});
-        CommandsList.put("mkdir",new int[]{1, 1});
-        CommandsList.put("rmdir",new int[]{1, 1});
-        CommandsList.put("mv",new int[]{2, 10});
-        CommandsList.put("rm",new int[]{1, 1});
+        CommandsList.put("cp",new int[]{2, 50});
+        CommandsList.put("cat",new int[]{1, 50});
+        CommandsList.put("more",new int[]{1, 50});
+        CommandsList.put("mkdir",new int[]{1, 50});
+        CommandsList.put("rmdir",new int[]{1, 50});
+        CommandsList.put("mv",new int[]{2, 50});
+        CommandsList.put("rm",new int[]{1, 50});
         CommandsList.put("args",new int[]{1, 1});
         CommandsList.put("date",new int[]{0, 0});
         CommandsList.put("help",new int[]{0, 0});
