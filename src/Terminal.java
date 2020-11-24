@@ -42,15 +42,10 @@ public class Terminal {
         if(handlePath(destinationPath).equals("")){
             return new ArrayList<String>(Arrays.asList("invalid path"));
         }
-        var dirName = Paths.get(handlePath(destinationPath));
-        ArrayList<String> dirFiles = new ArrayList<String>();
-        try (var paths = Files.newDirectoryStream(dirName)) {
-            for (Path path : paths) {
-                dirFiles.add(path.getFileName().toString());
-            }
-        }catch (IOException e) {
-            e.printStackTrace();
-        }
+        String[] pathnames;
+        File f = new File(handlePath(destinationPath));
+        pathnames = f.list();
+        ArrayList<String> dirFiles = new ArrayList<String>(Arrays.asList(pathnames));
         return dirFiles;
     }
     
